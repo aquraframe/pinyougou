@@ -116,4 +116,9 @@ public class TypeTemplateController {
 	public List<Map> selectOptionlist(){
 		return typeTemplateService.selectOptionlist();
 	}
+	
+	@RequestMapping("/findSpecList")
+	public List<Map> findSpecList(long id){
+		return typeTemplateService.selectSpeclist(id);
+	}
 }

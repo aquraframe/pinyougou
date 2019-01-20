@@ -33,4 +33,8 @@ app.service('typeTemplateService',function($http){
 	this.selectOptionlist=function(){
 		return $http.get("../typeTemplate/selectOptionlist.do");
 	}
+	
+	this.findSpecList=function(id){
+		return $http.get("../typeTemplate/findSpecList.do?id="+id);
+	}
 });

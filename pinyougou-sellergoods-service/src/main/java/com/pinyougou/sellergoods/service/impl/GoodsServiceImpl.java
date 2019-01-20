@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
@@ -19,6 +21,7 @@ import com.pinyougou.pojo.TbGoods;
 import com.pinyougou.pojo.TbGoodsExample;
 import com.pinyougou.pojo.TbItem;
 import com.pinyougou.pojo.TbItemCat;
+import com.pinyougou.pojo.TbItemExample;
 import com.pinyougou.pojo.TbSeller;
 import com.pinyougou.pojo.TbGoodsExample.Criteria;
 import com.pinyougou.pojo.gruop.Goods;
@@ -32,6 +35,7 @@ import entity.PageResult;
  *
  */
 @Service
+@Transactional
 public class GoodsServiceImpl implements GoodsService {
 
 	@Autowired
@@ -79,6 +83,11 @@ public class GoodsServiceImpl implements GoodsService {
 		goodsMapper.insert(goods.getGoods());
 		goods.getGoodsDesc().setGoodsId(goods.getGoods().getId());
 		goodsDescMapper.insert(goods.getGoodsDesc());
+		saveItemList(goods);
+		
+	}
+	
+	private void saveItemList(Goods goods) {
 		if ("1".equals(goods.getGoods().getIsEnableSpec())) {
 			for (TbItem item : goods.getItemsList()) {
 				String title = goods.getGoods().getGoodsName();
@@ -98,8 +107,9 @@ public class GoodsServiceImpl implements GoodsService {
 			item.setIsDefault("1");
 			item.setNum(1111);
 			item.setSpec("{}");
+			setItemValue(goods, item);
+			itemMapper.insert(item);
 		}
-		
 	}
 
 	private void setItemValue(Goods goods,TbItem item) {
@@ -124,8 +134,15 @@ public class GoodsServiceImpl implements GoodsService {
 	 * 修改
 	 */
 	@Override
-	public void update(TbGoods goods){
-		goodsMapper.updateByPrimaryKey(goods);
+	public void update(Goods goods){			
+		goods.getGoods().setAuditStatus("0");
+		goodsMapper.updateByPrimaryKey(goods.getGoods());
+		goodsDescMapper.updateByPrimaryKey(goods.getGoodsDesc());
+		TbItemExample example = new TbItemExample();
+		com.pinyougou.pojo.TbItemExample.Criteria criteria = example.createCriteria();
+		criteria.andGoodsIdEqualTo(goods.getGoods().getId());
+		itemMapper.deleteByExample(example);
+		saveItemList(goods);
 	}	
 	
 	/**
@@ -138,7 +155,11 @@ public class GoodsServiceImpl implements GoodsService {
 		Goods goods = new Goods();
 		goods.setGoods(goodsMapper.selectByPrimaryKey(id));
 		goods.setGoodsDesc(goodsDescMapper.selectByPrimaryKey(id));
-		goods.setItemsList(itemsList);
+		TbItemExample example = new TbItemExample();
+		com.pinyougou.pojo.TbItemExample.Criteria criteria = example.createCriteria();
+		criteria.andGoodsIdEqualTo(id);
+		List<TbItem> list = itemMapper.selectByExample(example);
+		goods.setItemsList(list);
 		return goods;
 	}
 
@@ -148,7 +169,9 @@ public class GoodsServiceImpl implements GoodsService {
 	@Override
 	public void delete(Long[] ids) {
 		for(Long id:ids){
-			goodsMapper.deleteByPrimaryKey(id);
+			TbGoods goods = goodsMapper.selectByPrimaryKey(id);
+			goods.setIsDelete("1");
+			goodsMapper.updateByPrimaryKey(goods);
 		}		
 	}
 	
@@ -182,14 +205,31 @@ public class GoodsServiceImpl implements GoodsService {
 			if(goods.getIsEnableSpec()!=null && goods.getIsEnableSpec().length()>0){
 				criteria.andIsEnableSpecLike("%"+goods.getIsEnableSpec()+"%");
 			}
-			if(goods.getIsDelete()!=null && goods.getIsDelete().length()>0){
-				criteria.andIsDeleteLike("%"+goods.getIsDelete()+"%");
-			}
+				criteria.andIsDeleteIsNull();
+			
 	
 		}
 		
 		Page<TbGoods> page= (Page<TbGoods>)goodsMapper.selectByExample(example);		
 		return new PageResult(page.getTotal(), page.getResult());
 	}
+
+		@Override
+		public void updateStatus(Long[] ids, String status) {
+			for (Long id : ids) {
+				TbGoods goods = goodsMapper.selectByPrimaryKey(id);
+				goods.setAuditStatus(status);
+				goodsMapper.updateByPrimaryKey(goods);
+			}
+		}
+
+		@Override
+		public void updateMarket(Long[] ids,String isMarketable) {
+			for (Long id : ids) {
+				TbGoods goods = goodsMapper.selectByPrimaryKey(id);
+				goods.setIsMarketable(isMarketable);
+				goodsMapper.updateByPrimaryKey(goods);
+			}
+		}
 	
 }

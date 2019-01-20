@@ -1,5 +1,5 @@
  //控制层 
-app.controller('goodsController' ,function($scope,$controller,itemCatService,uploadService,goodsService,typeTemplateService){	
+app.controller('goodsController' ,function($scope,$controller,$location,itemCatService,uploadService,goodsService,typeTemplateService){	
 	
 	$controller('baseController',{$scope:$scope});//继承
 	
@@ -24,30 +24,46 @@ app.controller('goodsController' ,function($scope,$controller,itemCatService,upl
 	
 	//查询实体 
 	$scope.findOne=function(id){				
+		var id = $location.search()['id'];
+		if(id == null){
+			return;
+		}
 		goodsService.findOne(id).success(
 			function(response){
-				$scope.entity= response;					
+				$scope.entity= response;
+				editor.html($scope.entity.goodsDesc.introduction);
+				$scope.entity.goodsDesc.itemImages = JSON.parse($scope.entity.goodsDesc.itemImages);
+				$scope.entity.goodsDesc.customAttributeItems=JSON.parse($scope.entity.goodsDesc.customAttributeItems);
+				$scope.entity.goodsDesc.specificationItems=JSON.parse($scope.entity.goodsDesc.specificationItems);
+				var list = $scope.entity.itemsList;
+				for(var i = 0;i<list.length;i++){
+					list[i].spec=JSON.parse(list[i].spec);
+				}
 			}
 		);				
 	}
 	
 	//保存 
-	$scope.save=function(){				
+	$scope.save=function(){		
+		$scope.entity.goodsDesc.introduction=editor.html();
 		var serviceObject;//服务层对象  				
-		if($scope.entity.id!=null){//如果有ID
+		if($scope.entity.goods.id!=null){//如果有ID
 			serviceObject=goodsService.update( $scope.entity ); //修改  
 		}else{
 			serviceObject=goodsService.add( $scope.entity  );//增加 
 		}				
 		serviceObject.success(
-			function(response){
-				if(response.success){
-					//重新查询 
-		        	$scope.reloadList();//重新加载
-				}else{
-					alert(response.message);
-				}
-			}		
+				function(response){
+					if(response.success){
+						//重新查询 
+			        	alert("保存成功");//重新加载
+//			        	$scope.entity={};
+//			        	editor.html('');
+			        	location.href="./goods.html"
+					}else{
+						alert(response.message);
+					}
+				}		
 		);				
 	}
 	
@@ -152,7 +168,10 @@ app.controller('goodsController' ,function($scope,$controller,itemCatService,upl
 				function(response){
 					$scope.typeTemplate=response;
 					$scope.typeTemplate.brandIds=JSON.parse($scope.typeTemplate.brandIds);
-					$scope.entity.goodsDesc.customAttributeItems=JSON.parse($scope.typeTemplate.customAttributeItems);
+					var id = $location.search()['id'];
+					if(id == null){
+						$scope.entity.goodsDesc.customAttributeItems=JSON.parse($scope.typeTemplate.customAttributeItems);
+					}
 				});
 		typeTemplateService.findSpecList(newValue).success(
 				function(response){
@@ -210,4 +229,24 @@ app.controller('goodsController' ,function($scope,$controller,itemCatService,upl
 					}
 				});
 	}
+	
+	$scope.checkAttributeValue=function(specName,optionName){
+		var items = $scope.entity.goodsDesc.specificationItems;
+		var object = $scope.searchObjectByKey(items,'attributeName',specName);
+		if(object==null){
+			return false;
+		}
+		if(object.attributeValue.indexOf(optionName)>=0){
+			return true;
+		}
+		return false;
+	}
+	
+	$scope.updateMarket=function(isMarketable){
+		goodsService.updateMarket($scope.selectIds,isMarketable).success(
+				function(response){					
+						alert(response.message);				
+				});
+	}
+	
 });	
