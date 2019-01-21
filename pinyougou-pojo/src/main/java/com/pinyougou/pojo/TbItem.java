@@ -3,8 +3,10 @@ package com.pinyougou.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
+import org.springframework.data.solr.core.mapping.Dynamic;
 
 public class TbItem implements Serializable{
     /**
@@ -47,8 +49,20 @@ public class TbItem implements Serializable{
     private BigDecimal marketPrice;
 
     private String isDefault;
+    
+    @Dynamic
+    @Field("item_spec_*")
+    private Map<String, String> specMap;
+    
+    public Map<String, String> getSpecMap() {
+		return specMap;
+	}
 
-    @Field("item_goodsid")
+	public void setSpecMap(Map<String, String> specMap) {
+		this.specMap = specMap;
+	}
+
+	@Field("item_goodsid")
     private Long goodsId;
 
     private String sellerId;
