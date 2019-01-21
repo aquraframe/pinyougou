@@ -83,8 +83,7 @@ app.controller('contentController' ,function($scope,$controller,uploadService ,c
 		uploadService.uploadFile().success(
 				function(response){
 					if(response.success){
-						$scope.entity.pic=response.message;						
-						$scope.entity.url=response.message;						
+						$scope.entity.pic=response.message;																
 					}else{
 						alert(response.message);
 					}

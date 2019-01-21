@@ -93,6 +93,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		<artifactId>pinyougou-content-interface</artifactId>
 		<version>0.0.5-SNAPSHOT</version>
 	</dependency>
+	<dependency>
+		<groupId>com.pinyougou</groupId>
+		<artifactId>pinyougou-common</artifactId>
+		<version>0.0.5-SNAPSHOT</version>
+	</dependency>
   </dependencies>
   
   <build>  
