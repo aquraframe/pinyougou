@@ -1,6 +1,7 @@
 package com.pinyougou.sellergoods.service;
 import java.util.List;
 import com.pinyougou.pojo.TbGoods;
+import com.pinyougou.pojo.TbItem;
 import com.pinyougou.pojo.gruop.Goods;
 
 import entity.PageResult;
@@ -62,4 +63,6 @@ public interface GoodsService {
 	public void updateStatus(Long[] ids,String status);
 	
 	public void updateMarket(Long[] ids,String isMarketable);
+	
+	public List<TbItem> findItemListByGoodsIdAndStatus(Long[] goodsIds,String status);
 }

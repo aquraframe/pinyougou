@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.core.query.Query;
+import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -32,7 +34,7 @@ public class SolrUtil {
 		for (TbItem tbItem : list) {
 			Map specMap = JSON.parseObject(tbItem.getSpec());
 			tbItem.setSpecMap(specMap);
-			System.out.println(tbItem.getTitle());
+			System.out.println(tbItem.getUpdateTime());
 		}
 		solrTemplate.saveBeans(list);
 		solrTemplate.commit();
@@ -41,7 +43,15 @@ public class SolrUtil {
 	public static void main(String[] args) {		
 		ApplicationContext context = new ClassPathXmlApplicationContext("classpath*:spring/applicationContext*.xml");
 		SolrUtil solrUtil = (SolrUtil) context.getBean("solrUtil");
-		solrUtil.importItemDate();
+//		solrUtil.importItemDate();
+		solrUtil.deleAll();
 		
 	}
+	
+	public void deleAll() {
+		Query query = new SimpleQuery("*:*");
+		solrTemplate.delete(query);
+		solrTemplate.commit();
+	}
+	
 }
