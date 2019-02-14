@@ -5,7 +5,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 <title>产品列表页</title>
-<link rel="icon" href="assets/img/favicon.ico">
+<!-- <link rel="icon" href="assets/img/favicon.ico"> -->
 
 <link rel="stylesheet" type="text/css" href="css/webbase.css" />
 <link rel="stylesheet" type="text/css" href="css/pages-list.css" />
@@ -28,7 +28,7 @@
 
 </head>
 
-<body ng-app="pinyougou" ng-controller="searchController" ng-init = "laodKeywords()">
+<body ng-app="pinyougou" ng-controller="searchController" ng-init = "loadKeywords()">
 
 	<!-- 头部栏位 -->
 	<!--页面顶部-->
@@ -290,7 +290,7 @@
 						<li class="yui3-u-1-5" ng-repeat="item in resultMap.rows">
 							<div class="list-wrap">
 								<div class="p-img">
-									<a href="item.html" target="_blank"><img
+									<a href="http://localhost:9105/{{item.id}}.html" target="_blank"><img
 										src="{{item.image}}" /></a>
 								</div>
 								<div class="price">
