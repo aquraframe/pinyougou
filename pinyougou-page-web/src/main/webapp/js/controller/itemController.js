@@ -1,4 +1,4 @@
-app.controller('itemController',function($scope){
+app.controller('itemController',function($scope,$http){
 	$scope.addNum = function(x){
 		$scope.num = $scope.num+x;
 		if($scope.num < 1){
@@ -53,6 +53,14 @@ app.controller('itemController',function($scope){
 	}
 	
 	$scope.addToCart = function(){
-		alert("skuid"+$scope.sku.id);
-	}
+		$http.get("http://localhost:9107/cart/addGoodsToCartList.do?itemId="+$scope.sku.id+"&num="
+				+$scope.num,{'withCredentials':true}).success(
+				function(response){
+					if(response.success){
+						location.href='http://localhost:9107/cart.html'
+					}else{
+						alert(response.message);
+					}
+				})
+	};
 })

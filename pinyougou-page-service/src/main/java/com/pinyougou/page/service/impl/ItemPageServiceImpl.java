@@ -74,7 +74,6 @@ public class ItemPageServiceImpl implements ItemPageService{
 			 example.setOrderByClause("is_default desc");
 			 List<TbItem> itemList = itemMapper.selectByExample(example);
 			 dataModel.put("itemList", itemList);	
-			 
 			 Writer out = new FileWriterWithEncoding(pagedir+goodsId+".html","utf-8");		
 			 template.process(dataModel, out);
 			 out.close();
